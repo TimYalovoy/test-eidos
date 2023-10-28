@@ -45,7 +45,7 @@ namespace UserInput
             {
                 newPosition = new Vector3(newPosition.x, newPosition.y + GetDelta(), newPosition.z);
             }
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftShift))
             {
                 newPosition = new Vector3(newPosition.x, newPosition.y - GetDelta(), newPosition.z);
             }
