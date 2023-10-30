@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaveSystem
@@ -28,7 +26,11 @@ namespace SaveSystem
     [Serializable]
     public class CharacterTransform
     {
+        [Header("Position")]
         [SerializeField] public Vector3 Position;
-        [SerializeField] public Quaternion Rotation;
+        [Header("Rotation")]
+        [SerializeField] public Quaternion BodyRotation;
+        [SerializeField] public Quaternion HeadRotation;
+        [SerializeField] public Quaternion EyeRotation;
     }
 }

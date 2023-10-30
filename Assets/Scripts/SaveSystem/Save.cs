@@ -1,23 +1,40 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SaveSystem
 {
-    public class Save : MonoBehaviour
+    public sealed class Save : MonoBehaviour, ISaver
     {
+        public SaveData Data { get; set; }
+
         [SerializeField] private Button saveButton;
         [SerializeField] private Button loadButton;
 
         private string _saveFileName = "save.json";
         private string _saveFilePath = "";
 
-        private SaveData _saveData;
+        private List<ISaveable> saveables = new List<ISaveable>();
+
+        public event Action<SaveData> SaveIsLoaded;
 
         private void Awake()
         {
             saveButton.onClick.AddListener(SaveData);
             loadButton.onClick.AddListener(LoadData);
+
+            var objs = FindObjectsOfType<MonoBehaviour>();
+            foreach (var obj in objs)
+            {
+                if (obj is ISaveable)
+                {
+                    saveables.Add(obj as ISaveable);
+                }
+            }
+
+            Data = new SaveData();
         }
 
         private void Start()
@@ -31,12 +48,14 @@ namespace SaveSystem
             loadButton.onClick.RemoveListener(LoadData);
         }
 
-        private void SaveData()
+        public void SaveData()
         {
+            saveables.ForEach(saveable => saveable.SetData(this));
             try
             {
-                var jsonContent = JsonUtility.ToJson(_saveData, true);
+                var jsonContent = JsonUtility.ToJson(Data, true);
                 File.WriteAllText(_saveFilePath, jsonContent);
+
             }
             catch (System.Exception e)
             {
@@ -44,7 +63,7 @@ namespace SaveSystem
             }
         }
 
-        private void LoadData()
+        public void LoadData()
         {
             if (IsSaveFileNotExist())
             {
@@ -55,12 +74,26 @@ namespace SaveSystem
             try
             {
                 var jsonContent = File.ReadAllText(_saveFilePath);
-                JsonUtility.FromJsonOverwrite(jsonContent, _saveData);
+                JsonUtility.FromJsonOverwrite(jsonContent, Data);
+
+                SaveIsLoaded.Invoke(Data);
             }
             catch (System.Exception e)
             {
                 throw new System.Exception($"{e.Source}: {e.Message}\nSomething went wrong: Cant parse save data from json. Check for syntax error of jsonFile");
             }
+        }
+
+        public void RemoveSaveFile()
+        {
+            if (IsSaveFileNotExist())
+            {
+                Debug.Log($"Save file already removed or unless is not created.");
+                return;
+            }
+
+            File.Delete(_saveFilePath);
+            Debug.Log($"Save file <color=green>successfull</color> removed");
         }
 
         private bool IsSaveFileNotExist() => !File.Exists(_saveFilePath);

@@ -71,16 +71,6 @@ namespace Following
             }
         }
 
-        private void Start()
-        {
-
-        }
-
-        private void Update()
-        {
-
-        }
-
         public void ToggleFollowing()
         {
             stopFollowing.OnPointerClick(new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current));

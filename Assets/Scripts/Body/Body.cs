@@ -1,67 +1,56 @@
 using Following;
+using SaveSystem;
 using System.Collections;
 using UnityEngine;
 
 namespace Body
 {
-    public class Body : MonoBehaviour, IFollowable
+    public sealed class Body : Follower, IFollowable
     {
-        public float RotationSpeed { get; set; } = 16f;
-        
-        private Transform _target;
-        private Quaternion _initialRotation;
-        private Quaternion _targetRotation;
-
-        private bool _isRotationInProgress = false;
-
-        void Start()
+        private void Awake()
         {
+            if (_saveData is not null)
+            {
+                transform.position = _saveData.CharacterTransform.Position;
+                transform.localRotation = _saveData.CharacterTransform.EyeRotation;
+            }
+
             _initialRotation = transform.rotation;
         }
 
-        void FixedUpdate()
+        public override void LookAtTarget(Transform target)
         {
-
-        }
-
-        public void LookAtTarget(Transform target)
-        {
-            Vector3 targetDirection = transform.position - target.position;
-            targetDirection.y = 0f;
-
-            _targetRotation = Quaternion.LookRotation(targetDirection);
+            base.LookAtTarget(target);
 
             if (!_isRotationInProgress)
                 StartCoroutine(SmoothRotation());
         }
 
-        // smooth rotation to target rotation
-        private IEnumerator SmoothRotation()
+        protected override void CalculateRelativePosition(Transform target)
         {
-            if (_isRotationInProgress) yield break;
-            _isRotationInProgress = true;
-
-            yield return new WaitWhile(() =>
-            {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, _targetRotation, RotationSpeed * Time.fixedDeltaTime);
-                return _targetRotation != transform.rotation;
-            });
-
-            _isRotationInProgress = false;
+            base.CalculateRelativePosition(target);
+            _relativePos.y = 0f;
         }
 
-        public void FollowFor(Transform target)
-        {
-            _target = target;
-        }
-
-        public void ToggleFollowingLogic()
+        public override void ToggleFollowingLogic()
         {
             StopCoroutine(SmoothRotation());
             _targetRotation = _initialRotation;
             _isRotationInProgress = false;
 
             StartCoroutine(SmoothRotation());
+        }
+
+        public override void SetData(ISaver saver)
+        {
+            saver.Data.CharacterTransform.BodyRotation = transform.localRotation;
+            saver.Data.CharacterTransform.Position = transform.localPosition;
+        }
+        public override void SaveIsLoaded(ISaver saver)
+        {
+            base.SaveIsLoaded(saver);
+            transform.localRotation = saver.Data.CharacterTransform.BodyRotation;
+            if (!_isFollowingForTarget) transform.localPosition = saver.Data.CharacterTransform.Position;
         }
     }
 }

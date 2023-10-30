@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.Accessibility;
 
 namespace Following
 {
     public interface IFollowable
     {
-        public void FollowFor(Transform target);
-        public void ToggleFollowingLogic();
+        public virtual void FollowFor(Transform target) { }
+        public virtual void ToggleFollowingLogic() { }
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6605077238877615515}
   - component: {fileID: 195703699457541884}
   - component: {fileID: 6579268820401199485}
+  - component: {fileID: 8279560405542888609}
   m_Layer: 0
   m_Name: Iris
   m_TagString: Untagged
@@ -84,6 +85,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8279560405542888609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4060675563338804878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30a3abe8ee5fdf34fbf2c88f9432f104, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  partOfBody: 4
 --- !u!1 &5449971440886072030
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,11 +278,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22c65d477418dc43b1d03c3773d2816, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  side: 0
-  minBounds: {x: 0, y: 0, z: 0, w: 0}
-  maxBounds: {x: 0, y: 0, z: 0, w: 0}
-  currentRotation: {x: 0, y: 0, z: 0, w: 0}
-  x: 0
-  y: 0
-  z: 0
-  diff: {x: 0, y: 0, z: 0}
