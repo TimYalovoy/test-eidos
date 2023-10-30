@@ -18,9 +18,9 @@ namespace Recoloring
     {
         [SerializeField] private PartOfBody partOfBody;
 
-        [SerializeField] private Save _saveSystem;
         private MeshRenderer _meshRenderer;
-
+        
+        private Save _saveSystem;
         private UIHotKeys _hotKeys;
 
         private void Awake()

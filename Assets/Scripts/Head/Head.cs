@@ -1,7 +1,5 @@
 using Following;
 using SaveSystem;
-using System;
-using System.Collections;
 using UnityEngine;
 
 namespace Head
@@ -31,7 +29,7 @@ namespace Head
             if (!_isRotationInProgress)
                 StartCoroutine(SmoothRotation());
 
-            var verticalAngle = GetSignedAngle(_relativePos.normalized, transform.up, transform.parent.up);
+            var verticalAngle = Vector3.SignedAngle(transform.up, transform.parent.up, _relativePos.normalized);
             if (verticalAngle > f_maxVerticalConstraint)
             {
                 RaiseBoundsIsReached(target);
@@ -41,7 +39,7 @@ namespace Head
                 RaiseBoundsIsReached(target);
             }
 
-            var horizontalAngle = GetSignedAngle(_relativePos.normalized, transform.right, transform.parent.right);
+            var horizontalAngle = Vector3.SignedAngle(transform.right, transform.parent.right, _relativePos.normalized);
             if (horizontalAngle > f_maxHorizontalConstraint)
             {
                 RaiseBoundsIsReached(target);
@@ -54,8 +52,10 @@ namespace Head
 
         public override void ToggleFollowingLogic()
         {
-            StopCoroutine(SmoothRotation());
-            _targetRotation = _initialRotation;
+            _isFollowingForTarget = !_isFollowingForTarget;
+            StopAllCoroutines();
+
+            _targetRotation = Quaternion.Inverse(Quaternion.identity);
             _isRotationInProgress = false;
 
             StartCoroutine(SmoothRotation());
@@ -70,6 +70,13 @@ namespace Head
         {
             base.SaveIsLoaded(saver);
             transform.localRotation = saver.Data.CharacterTransform.HeadRotation;
+
+            StopCoroutine(SmoothRotation());
+            _isRotationInProgress = false;
+            _initialRotation = Quaternion.Euler(transform.TransformVector(transform.localRotation.eulerAngles));
+            _targetRotation = _initialRotation;
+
+            StartCoroutine(SmoothRotation());
         }
     }
 }

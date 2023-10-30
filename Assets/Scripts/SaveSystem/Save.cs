@@ -8,8 +8,13 @@ namespace SaveSystem
 {
     public sealed class Save : MonoBehaviour, ISaver
     {
-        public SaveData Data { get; set; }
+        public SaveData Data 
+        { 
+            get => _data; 
+            set => _data = value;
+        }
 
+        [SerializeField] private SaveData _data = new SaveData();
         [SerializeField] private Button saveButton;
         [SerializeField] private Button loadButton;
 
@@ -33,8 +38,6 @@ namespace SaveSystem
                     saveables.Add(obj as ISaveable);
                 }
             }
-
-            Data = new SaveData();
         }
 
         private void Start()
@@ -77,6 +80,7 @@ namespace SaveSystem
                 JsonUtility.FromJsonOverwrite(jsonContent, Data);
 
                 SaveIsLoaded.Invoke(Data);
+                saveables.ForEach(saveable => saveable.SaveIsLoaded(this));
             }
             catch (System.Exception e)
             {

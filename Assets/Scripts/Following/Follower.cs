@@ -7,7 +7,12 @@ namespace Following
 {
     public abstract class Follower : MonoBehaviour, IFollowable, ISaveable
     {
-        public float RotationSpeed { get; set; } = 1f;
+        public float RotationSpeed { get; set; } = 28f;
+        public bool IsFollowing 
+        { 
+            get => _isFollowingForTarget; 
+            protected set => _isFollowingForTarget = value; 
+        }
         
         protected Transform _target;
         protected Vector3 _relativePos = Vector3.zero;
@@ -46,20 +51,10 @@ namespace Following
             yield return new WaitWhile(() =>
             {
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, _targetRotation, RotationSpeed * Time.fixedDeltaTime);
-                return _targetRotation != transform.rotation;
+                return true;
             });
 
             _isRotationInProgress = false;
-        }
-
-        protected virtual float GetSignedAngle(Vector3 normal, Vector3 selfAxis, Vector3 parentAxis)
-        {
-            var angle = Vector3.Angle(selfAxis, parentAxis);
-            var cross = Vector3.Cross(selfAxis, parentAxis);
-            var dot = Vector3.Dot(normal, cross);
-            var sign = Mathf.Sign(dot);
-            var signedAngle = angle * sign;
-            return signedAngle;
         }
 
         public void RaiseBoundsIsReached(Transform target)

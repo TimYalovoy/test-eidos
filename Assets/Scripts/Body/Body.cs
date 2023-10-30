@@ -1,6 +1,5 @@
 using Following;
 using SaveSystem;
-using System.Collections;
 using UnityEngine;
 
 namespace Body
@@ -34,8 +33,10 @@ namespace Body
 
         public override void ToggleFollowingLogic()
         {
-            StopCoroutine(SmoothRotation());
-            _targetRotation = _initialRotation;
+            _isFollowingForTarget = !_isFollowingForTarget;
+            StopAllCoroutines();
+
+            _targetRotation = Quaternion.Inverse(Quaternion.identity);
             _isRotationInProgress = false;
 
             StartCoroutine(SmoothRotation());
@@ -50,7 +51,17 @@ namespace Body
         {
             base.SaveIsLoaded(saver);
             transform.localRotation = saver.Data.CharacterTransform.BodyRotation;
-            if (!_isFollowingForTarget) transform.localPosition = saver.Data.CharacterTransform.Position;
+            if (!_isFollowingForTarget)
+            {
+                transform.localPosition = saver.Data.CharacterTransform.Position;
+
+                StopCoroutine(SmoothRotation());
+                _isRotationInProgress = false;
+                _initialRotation = Quaternion.Euler(transform.TransformVector(transform.localRotation.eulerAngles));
+                _targetRotation = _initialRotation;
+
+                StartCoroutine(SmoothRotation());
+            }
         }
     }
 }
